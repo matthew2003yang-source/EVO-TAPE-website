@@ -1,0 +1,32 @@
+#!/bin/bash
+# Double-click this file (or run: bash push-to-github.command) to push EVO TAPE to GitHub.
+cd "$(dirname "$0")" || exit 1
+
+echo "──────────────────────────────────────────────"
+echo "  Pushing EVO TAPE → github.com/matthew2003yang-source/EVO-TAPE-website"
+echo "──────────────────────────────────────────────"
+
+# Clear stray lock/temp files left by the prep environment
+rm -f .git/index.lock .git/HEAD.lock
+find .git/objects -name 'tmp_obj_*' -delete 2>/dev/null
+
+# Make sure the remote is set (no-op if it already is)
+git remote get-url origin >/dev/null 2>&1 || \
+  git remote add origin https://github.com/matthew2003yang-source/EVO-TAPE-website.git
+
+echo "Pushing branch 'main'..."
+echo "If prompted, enter your GitHub username and a Personal Access Token (not your password)."
+echo ""
+git push -u origin main
+
+status=$?
+echo ""
+if [ $status -eq 0 ]; then
+  echo "✅ Done! Refresh your repo page: https://github.com/matthew2003yang-source/EVO-TAPE-website"
+else
+  echo "⚠️  Push did not complete (exit $status). Common fixes:"
+  echo "   • Auth: use your GitHub username + a Personal Access Token with 'repo' scope."
+  echo "   • If the remote repo already has commits, run:  git pull --rebase origin main  then re-run this."
+fi
+echo ""
+read -p "Press Return to close this window."
