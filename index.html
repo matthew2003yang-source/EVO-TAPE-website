@@ -976,7 +976,7 @@ T.cart = ()=>{
       <div class="dr-row"><span>Taxes</span><span style="color:var(--muted-2)">Calc. at checkout</span></div>
       ${shippingCost()>0?'<div class="dr-row" style="font-size:12px;color:var(--muted-2)">The EVO TAPE 6 Pack ships free — add one to waive shipping.</div>':'<div class="dr-row" style="font-size:12px;color:var(--blue-2)">✓ Your order qualifies for free shipping</div>'}
       <div class="dr-row total" style="border-top:1px solid var(--line);padding-top:14px"><span>Estimated Total</span><b id="cartTotal">$${cartTotal().toFixed(2)}</b></div>
-      <button class="btn btn-primary btn-block" data-magnetic onclick="showToast('Checkout is a demo — wire up Stripe in production')"><span class="lbl">${svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',2)} Proceed to Checkout</span></button>
+      <button class="btn btn-primary btn-block" data-magnetic onclick="checkout()"><span class="lbl">${svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',2)} Proceed to Checkout</span></button>
       <div class="dr-badges" style="margin-top:18px">
         <div>${svg(I.shield,2)} Secure</div><div>${svg(I.truck,2)} Fast Shipping</div><div>${svg(I.head,2)} Support</div>
       </div>
@@ -1117,6 +1117,14 @@ const SHIP_FEE=7.99;
 /* 6 Pack ships free; single rolls add a flat shipping fee (waived if a 6 Pack is in the cart) */
 function shippingCost(){if(!cart.length)return 0;return cart.some(c=>PRODUCTS[c.id].freeShipping)?0:SHIP_FEE;}
 function cartTotal(){return subtotal()+shippingCost();}
+/* Stripe Payment Links: 6 Pack vs single Original */
+const STRIPE_SIXPACK='https://buy.stripe.com/8x2eVf9hr38c2Wa3kR5wI01';
+const STRIPE_ORIGINAL='https://buy.stripe.com/00wbJ351b7osgN02gN5wI00';
+function checkout(){
+  if(!cart.length)return;
+  if(cart.some(c=>c.id==='sixpack')){window.location.href=STRIPE_SIXPACK;return;}
+  window.location.href=STRIPE_ORIGINAL;
+}
 function updateCartUI(){
   const n=cart.reduce((s,c)=>s+c.q,0);
   const cc=document.getElementById('cartCount'); cc.textContent=n; cc.classList.toggle('show',n>0);
