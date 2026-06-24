@@ -949,14 +949,15 @@ T.contact = ()=>`
   </div>
   <form class="form" data-reveal-scale onsubmit="return submitForm(event,this)">
     <h3 style="font-family:'Bebas Neue';font-size:26px;letter-spacing:.04em;margin-bottom:6px">Send Us a Message</h3>
+    <div class="form-status" id="formStatus" style="display:none;padding:12px;margin-bottom:14px;border-radius:var(--r);text-align:center;font-size:14px"></div>
     <div class="fgrid">
-      <div class="field"><input placeholder=" " required><label>Full Name</label></div>
-      <div class="field"><input type="email" placeholder=" " required><label>Email Address</label></div>
-      <div class="field"><input placeholder=" "><label>Company / Organization</label></div>
-      <div class="field"><select data-other><option value="" disabled selected hidden></option><option>General Inquiry</option><option>Wholesale</option><option>Order Support</option><option>Returns &amp; Exchanges</option><option value="__other">Other…</option></select><label>Subject</label></div>
-      <div class="field full"><textarea placeholder=" " required></textarea><label>Your Message</label></div>
+      <div class="field"><input name="name" placeholder=" " required><label>Full Name</label></div>
+      <div class="field"><input name="email" type="email" placeholder=" " required><label>Email Address</label></div>
+      <div class="field"><input name="company" placeholder=" "><label>Company / Organization</label></div>
+      <div class="field"><select name="subject" data-other><option value="" disabled selected hidden></option><option>General Inquiry</option><option>Wholesale</option><option>Order Support</option><option>Returns &amp; Exchanges</option><option value="__other">Other…</option></select><label>Subject</label></div>
+      <div class="field full"><textarea name="message" placeholder=" " required></textarea><label>Your Message</label></div>
     </div>
-    <button class="btn btn-primary btn-block" data-magnetic style="margin-top:16px"><span class="lbl">Send Message ${svg('<path d="M5 12h14M13 6l6 6-6 6"/>')}</span></button>
+    <button class="btn btn-primary btn-block" data-magnetic style="margin-top:16px" type="submit"><span class="lbl">Send Message ${svg('<path d="M5 12h14M13 6l6 6-6 6"/>')}</span></button>
   </form>
 </div></section>`;
 
@@ -1158,7 +1159,7 @@ document.getElementById('scrim').onclick=closeDrawer;
 /* ============ PDP / ACCORDION ============ */
 function pdpQty(d){const el=document.getElementById('pdpQty');el.textContent=Math.max(1,+el.textContent+d);gsap.fromTo(el,{scale:1.3},{scale:1,duration:.3});}
 function toggleAcc(btn){const it=btn.parentElement,a=it.querySelector('.acc-a');const open=it.classList.toggle('open');a.style.maxHeight=open?a.scrollHeight+'px':0;}
-function submitForm(e,f){e.preventDefault();const btn=f.querySelector('button .lbl');const orig=btn.innerHTML;btn.innerHTML=svg('<path d="M5 13l4 4L19 7"/>',2.5)+' Sent!';f.querySelectorAll('input,textarea').forEach(i=>i.value='');showToast('Message sent — we\'ll be in touch!');setTimeout(()=>btn.innerHTML=orig,2200);return false;}
+function submitForm(e,f){e.preventDefault();const btn=f.querySelector('button');const lblSpan=btn.querySelector('.lbl');const orig=lblSpan.innerHTML;const statusEl=f.querySelector('#formStatus');btn.disabled=true;lblSpan.innerHTML=svg('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',2.5)+' Sending...';const formData=new FormData(f);fetch('https://formspree.io/f/mnjkjapl',{method:'POST',body:formData,headers:{'Accept':'application/json'}}).then(r=>{if(r.ok){statusEl.style.display='block';statusEl.style.background='rgba(0,102,255,.1)';statusEl.style.color='var(--blue-2)';statusEl.textContent='✓ Message sent successfully! We\'ll be in touch soon.';lblSpan.innerHTML=svg('<path d="M5 13l4 4L19 7"/>',2.5)+' Sent!';f.querySelectorAll('input,textarea,select').forEach(i=>i.value='');showToast('Message sent — we\'ll be in touch!');setTimeout(()=>{btn.disabled=false;lblSpan.innerHTML=orig;statusEl.style.display='none';},3000);}else{throw new Error('Form submission failed');}}).catch(err=>{statusEl.style.display='block';statusEl.style.background='rgba(255,67,67,.1)';statusEl.style.color='#ff4343';statusEl.textContent='✗ Error sending message. Please try again or email us directly.';btn.disabled=false;lblSpan.innerHTML=orig;showToast('Error: Could not send message. Please try again.');});return false;}
 
 /* ============ TOAST ============ */
 let toastT;
